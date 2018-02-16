@@ -16,6 +16,8 @@ ADD_SUBDIRECTORY(reservoir)
 ADD_SUBDIRECTORY(netparser)
 ADD_SUBDIRECTORY(nullhopinterface)
 ADD_SUBDIRECTORY(arduinocnt)
+ADD_SUBDIRECTORY(nsatinterface)
+ADD_SUBDIRECTORY(keyboard_input)
 
 # Support private modules that don't get considered for commit,
 # by reserving a directory called PrivateModules with its own

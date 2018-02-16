@@ -299,7 +299,9 @@ static void caerNetParserModuleConfig(caerModuleData moduleData) {
 				("Did NOT Finish Board Connectivity Programming from " + filePath).c_str());
 
 		}
-
+  
+  sshsNodePutBool(moduleData->moduleNode, "ProgramNetworkFrom.txt", false);
+	state->programTXT = false;
 	}
 	else if (!newProgramTXT && state->programTXT) {
 		state->programTXT = false;
@@ -365,6 +367,8 @@ static void caerNetParserModuleConfig(caerModuleData moduleData) {
 		caerLog(CAER_LOG_NOTICE, __func__, "Starting Network Clearning");
 		caerClearConnections(moduleData);
 		caerLog(CAER_LOG_NOTICE, __func__, "Finished Network Clearning");
+    sshsNodePutBool(moduleData->moduleNode, "ClearNetwork", false);
+    state->clear = false;
 
 	}
 	else if (!newBiases && state->clear) {

@@ -11,6 +11,7 @@
 // Created by rodrigo on 5/30/17.
 //
 
+#include <algorithm>    // std::find_if
 #include <iostream>
 #include <map>
 #include <vector>
@@ -24,18 +25,35 @@
 #include <libcaer/devices/dynapse.h>
 #include "modules/ini/dynapse_utils.h"
 #include "base/mainloop.h"
+//
+// Following code to use this code in standalone mode
+//#include "testcaer.h"
 
 using namespace std;
 
 struct SRAM_cell;
 
-struct  Neuron {
+struct Neuron; 
+
+struct Synapse {
+    Neuron * neuron;
+    uint8_t connection_type;
+    uint8_t camid;
+    Synapse(Neuron* neuron_n, uint8_t connection_type_n);
+    Synapse(Neuron* neuron_n, uint8_t connection_type_n, uint8_t camid_n);
+    string GetLocString() const;
+    void Print() const;
+};
+
+uint8_t find_next_unused_cam(vector<Synapse *> CAM);
+
+struct Neuron {
     const uint8_t chip;
     const uint8_t core;
     const uint8_t neuron;
     vector<SRAM_cell> SRAM;
-    vector<Neuron *> CAM;
-    vector<uint8_t> synapse_type;
+    vector<Synapse *> CAM;
+    map< string, uint8_t > CAMmap;
 
     Neuron(uint8_t chip_n ,uint8_t core_n ,uint8_t neuron_n);
     Neuron();
@@ -45,6 +63,7 @@ struct  Neuron {
     void PrintCAM();
     string GetSRAMString();
     string GetCAMString();
+    string GetCAMmapString();
     vector<SRAM_cell>::iterator FindEquivalentSram(Neuron * post);
     vector<Neuron *>::iterator FindCamClash(Neuron * n);
 };
@@ -53,25 +72,24 @@ struct SRAM_cell{
     SRAM_cell(Neuron* n);
     SRAM_cell();
 
-    const uint8_t destinationChip;
+    uint8_t destinationChip;
     uint8_t destinationCores;
     vector<Neuron *> connectedNeurons;
 };
 
-class CamClashPred{
-private:
-    Neuron* neuronA_;
-public:
-    CamClashPred(Neuron* neuronA_);
-    bool operator()(const Neuron* neuronB);
-};
+//TODO class CamClashPred{
+//TODO private:
+//TODO     Neuron* neuronA_;
+//TODO public:
+//TODO     CamClashPred(Neuron* neuronA_);
+//TODO     bool operator()(const Neuron* neuronB);
+//TODO };
 
 // Make neuron object comparable
 bool operator < (const Neuron& x, const Neuron& y) ;
 bool operator > (const Neuron& x, const Neuron& y) ;
 bool operator == (const Neuron& x, const Neuron& y) ;
-
-
+bool operator == (const Synapse& x, const Synapse& y) ;
 
 // Class that manages all connections
 class ConnectionManager {
@@ -94,17 +112,27 @@ private:
     // Appends connection to software SRAM and CAM and calls caerDynapseWriteSram and caerDynapseWriteCam
     void MakeConnection(Neuron *pre, Neuron *post, uint8_t syn_strength, uint8_t connection_type);
 
+
 public:
     ConnectionManager(caerDeviceHandle h, sshsNode n);
+    void DeleteConnection(Synapse * syn, Neuron * post);
+
+    void find_connections_to_delete();
+
+    bool ExistsConnection(Neuron *pre, Neuron *post, uint8_t connection_type);
     
     void Clear();
+
+    vector<vector<int> > currentTable;
+    vector<vector<int> > inputTable;
+    vector<vector<int> > diffTable;
 
     map<Neuron, Neuron *> *GetNeuronMap();
     vector<Neuron*> FilterNeuronMap(uint8_t chip_n, uint8_t core_n);
     void PrintNeuronMap();
     stringstream GetNeuronMapString();
 
-    vector<Neuron *> GetNeuron(Neuron *pre);
+    Neuron * GetNeuron(Neuron *pre);
 
     // Checks for valid connection and calls MakeConnection
     // TODO: Implement syn_strength and connection type
@@ -116,13 +144,6 @@ public:
 // Reads net from txt file in format U02-C02-N002->U02-C02-N006
 bool ReadNetTXT (ConnectionManager * manager, string filepath) ;
 
-// Reads net from XML file in format
-//<CONNECTIONS num="5">
-//  <CONNECTION connection_type="1" syn_stength="1">
-//     <PRE CHIP="1" CORE="1" NEURON="1" />
-//     <POST CHIP="2" CORE="2" NEURON="2" />
-//  </CONNECTION>
-//</CONNECTIONS>
 bool ReadNetXML (ConnectionManager * manager, string filepath) ;
 
 // Reads net from txt file in format U00-C00-IF_AHTAU_N-7-34-true

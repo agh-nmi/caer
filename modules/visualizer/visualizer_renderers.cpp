@@ -428,6 +428,14 @@ static bool caerVisualizerRendererSpikeEvents(caerVisualizerPublicState state, c
 	std::vector<sf::Vertex> vertices((size_t) spikePacket.getEventValid() * 4);
 
 	// Render all valid events.
+    //start hunk1
+    uint32_t neuronID, label=-1, chipID;
+    sf::Text test;
+    test.setString("LALA");
+    test.setColor(sf::Color::White);
+    test.setCharacterSize(80);
+    test.setFont(*state->font);
+    //end hunk1
 	for (const auto &spikeEvent : spikePacket) {
 		if (!spikeEvent.isValid()) {
 			continue; // Skip invalid events.
@@ -435,6 +443,20 @@ static bool caerVisualizerRendererSpikeEvents(caerVisualizerPublicState state, c
 
 		// Render spikes with different colors based on core ID.
 		uint8_t coreId = spikeEvent.getSourceCoreID();
+        //start hunk2
+		neuronID = spikeEvent.getNeuronID();
+        chipID = spikeEvent.getChipID();
+        if (coreId == 3 && chipID == 3)
+            if (neuronID < 10)
+                label = neuronID;
+
+        if (label != -1) {
+            test.setString(std::to_string(label));
+            test.setColor(sf::Color::White);
+            test.setPosition(350, 250);
+            state->renderWindow->draw(test);
+        }
+        //end hunk2
 		sfml::Helpers::addPixelVertices(vertices, libcaer::devices::dynapse::spikeEventGetX(spikeEvent),
 			libcaer::devices::dynapse::spikeEventGetY(spikeEvent),
 			state->renderZoomFactor.load(std::memory_order_relaxed), dynapseCoreIdToColor(coreId));

@@ -5,6 +5,7 @@
 #include "ext/resources/LiberationSans-Bold.h"
 #include "ext/sfml/helpers.hpp"
 #include "modules/statistics/statistics.h"
+#include <iostream>
 #include <libcaer/ringbuffer.h>
 
 #include "visualizer_handlers.hpp"
@@ -651,6 +652,40 @@ static void handleEvents(caerModuleData moduleData) {
 
 				sshsNodePutBool(moduleData->moduleNode, "showStatistics", !currentShowStatistics);
 			}
+// start hunk1
+            else if (event.type == sf::Event::KeyPressed) {
+                switch(event.key.code) {
+                    case sf::Keyboard::Num1:
+                        sshsNodePutString(caerMainloopGetSourceNode(U16T(16)), "current_keypress", "1");
+                        break;
+                    case sf::Keyboard::Num2:
+                        sshsNodePutString(caerMainloopGetSourceNode(U16T(16)), "current_keypress", "2");
+                        break;
+                    case sf::Keyboard::Num3:
+                        sshsNodePutString(caerMainloopGetSourceNode(U16T(16)), "current_keypress", "3");
+                        break;
+                    case sf::Keyboard::Num4:
+                        sshsNodePutString(caerMainloopGetSourceNode(U16T(16)), "current_keypress", "4");
+                        break;
+                    case sf::Keyboard::Num5:
+                        sshsNodePutString(caerMainloopGetSourceNode(U16T(16)), "current_keypress", "5");
+                        break;
+                    case sf::Keyboard::Num6:
+                        sshsNodePutString(caerMainloopGetSourceNode(U16T(16)), "current_keypress", "6");
+                        break;
+                    case sf::Keyboard::Num7:
+                        sshsNodePutString(caerMainloopGetSourceNode(U16T(16)), "current_keypress", "7");
+                        break;
+                    case sf::Keyboard::Num8:
+                        sshsNodePutString(caerMainloopGetSourceNode(U16T(16)), "current_keypress", "8");
+                        break;
+                    case sf::Keyboard::Num9:
+                        sshsNodePutString(caerMainloopGetSourceNode(U16T(16)), "current_keypress", "9");
+                        break;
+                }
+            }
+// end hunk1
+
 			else {
 				// Forward event to user-defined event handler.
 				if (state->eventHandler->eventHandler != nullptr) {
