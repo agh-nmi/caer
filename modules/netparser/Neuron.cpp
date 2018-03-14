@@ -332,7 +332,7 @@ void ConnectionManager::DeleteConnection( Synapse * syn, Neuron * post){
                          it->destinationCores);
 
             caerLog(CAER_LOG_DEBUG, __func__, "Checking whether SRAM should be deleted");
-            printf("%d \n,",it->connectedNeurons.size());
+//printf("%d \n,",it->connectedNeurons.size());
 
             if(it->connectedNeurons.size()==0){
               caerLog(CAER_LOG_DEBUG, __func__, "No more connected neurons. Deleting SRAM");
@@ -358,7 +358,7 @@ void ConnectionManager::DeleteConnection( Synapse * syn, Neuron * post){
               "POSTADDR:" + to_string(NeuronCamAddress(post->neuron,post->core))+ ", " +
               "TYPE:" + to_string(exsyn->connection_type);
 
-              caerLog(CAER_LOG_DEBUG, __func__, message.c_str());
+              caerLog(CAER_LOG_NOTICE, __func__, message.c_str());
               camPtr = post->CAM.erase(camPtr);
               caerDynapseWriteCam(handle, 0, NeuronCamAddress(post->neuron,post->core),
                           (uint32_t) exsyn->camid, exsyn->connection_type);
@@ -431,7 +431,7 @@ void ConnectionManager::MakeConnection( Neuron * pre, Neuron * post, uint8_t cam
         "S:" + to_string(sramNumber) + "[" + to_string(pre->SRAM.size())+ "], " +
         "DB: " + to_string(it->destinationCores);
 
-        caerLog(CAER_LOG_DEBUG, __func__, message.c_str());
+        caerLog(CAER_LOG_NOTICE, __func__, message.c_str());
 
         // Program SRAM
          caerDeviceConfigSet(handle, DYNAPSE_CONFIG_CHIP, DYNAPSE_CONFIG_CHIP_ID, pre->chip);
@@ -450,7 +450,7 @@ void ConnectionManager::MakeConnection( Neuron * pre, Neuron * post, uint8_t cam
         "POSTADDR:" + to_string(NeuronCamAddress(post->neuron,post->core))+ ", " +
         "TYPE:" + to_string(connection_type);
 
-        caerLog(CAER_LOG_DEBUG, __func__, message.c_str());
+        caerLog(CAER_LOG_NOTICE, __func__, message.c_str());
 
         // Program CAM
         caerDeviceConfigSet(handle, DYNAPSE_CONFIG_CHIP, DYNAPSE_CONFIG_CHIP_ID, post->chip);
